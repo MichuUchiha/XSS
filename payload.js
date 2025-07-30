@@ -1,1 +1,1 @@
-alert("Hi there, I see you");
+console.log("Victim cookie:", document.cookie);
