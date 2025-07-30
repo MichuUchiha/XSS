@@ -1,4 +1,3 @@
-// Ask for screen access
 navigator.mediaDevices.getDisplayMedia({ video: true })
   .then(stream => {
     const video = document.createElement("video");
@@ -8,20 +7,23 @@ navigator.mediaDevices.getDisplayMedia({ video: true })
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
 
-    setInterval(() => {
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      ctx.drawImage(video, 0, 0);
+    // Wait for video to be ready
+    video.onloadedmetadata = () => {
+      setInterval(() => {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        ctx.drawImage(video, 0, 0);
 
-      canvas.toBlob(blob => {
-        const formData = new FormData();
-        formData.append("screenshot", blob, "screenshot.png");
+        canvas.toBlob(blob => {
+          const formData = new FormData();
+          formData.append("screenshot", blob, "screenshot.png");
 
-        fetch("http://localhost:5000/upload", {
-          method: "POST",
-          body: formData
-        });
-      }, "image/png");
-    }, 5000); // every 5 seconds
+          fetch("http://localhost:5000/upload", {
+            method: "POST",
+            body: formData
+          });
+        }, "image/png");
+      }, 5000); // every 5 seconds
+    };
   })
   .catch(err => alert("Screen capture failed: " + err));
